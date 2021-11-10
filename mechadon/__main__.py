@@ -1,0 +1,3 @@
+import mechadon
+
+mechadon.run()

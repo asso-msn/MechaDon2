@@ -1,0 +1,4 @@
+/config.json
+/app.db
+__pycache__/
+/.venv/
