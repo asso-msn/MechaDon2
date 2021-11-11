@@ -42,11 +42,11 @@ class AutoreplyCog(BaseCog):
     async def on_message(self, message: Message):
         if message.author.bot:
             return
-        for sticker in self.get_autoreplies(message.guild):
-            if not sticker.matches(message.content):
+        for reply in self.get_autoreplies(message.guild):
+            if not reply.matches(message.content):
                 continue
             with message.channel.typing():
-                await message.reply(sticker.text, file=sticker.get_file())
+                await message.reply(reply.text, file=reply.get_file())
             message.channel.typing
 
     @commands.command('reply')
