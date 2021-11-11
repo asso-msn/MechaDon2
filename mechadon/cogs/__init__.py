@@ -1,5 +1,6 @@
-from discord import Bot
+from discord import Bot, Embed
 from discord.ext.commands import Cog, Context
+from discord.mentions import AllowedMentions
 
 class BaseCog(Cog):
     def __init__(self, bot: Bot = None):
@@ -7,7 +8,8 @@ class BaseCog(Cog):
 
     async def reply(self, context: Context, *words, sep=' '):
         msg = sep.join(map(str, words)) or '*Empty*'
-        return await context.reply(msg)
+        embed = Embed(description=msg)
+        return await context.reply(embed=embed, allowed_mentions=AllowedMentions.none())
 
     @staticmethod
     def get_roles_by_id(context):

@@ -41,7 +41,7 @@ class SelfroleCog(BaseCog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def rolealias(self, context: Context, alias: str, *, role: RoleLenient = None):
+    async def alias(self, context: Context, alias: str, *, role: RoleLenient = None):
         alias_db = RoleLenient.get_alias(context, alias)
         if role is None:
             if not alias_db:

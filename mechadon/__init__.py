@@ -1,6 +1,7 @@
 import importlib
 from pathlib import Path
-from discord.ext.commands import Bot, Cog
+from discord.ext.commands import Bot
+from discord.mentions import AllowedMentions
 
 from .config import Config
 
@@ -8,7 +9,10 @@ from .config import Config
 APP_DIR = Path(__file__).parent
 
 config = Config()
-bot = Bot(command_prefix=config.prefix)
+bot = Bot(
+    command_prefix=config.prefix,
+    allowed_mentions=AllowedMentions(everyone=False, roles=False),
+)
 
 
 def get_cogs_modules() -> dict:

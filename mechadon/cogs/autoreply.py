@@ -52,8 +52,8 @@ class AutoreplyCog(BaseCog):
     @commands.command('reply')
     @commands.has_permissions(administrator=True)
     async def add_reply(self, context: Context, name, *, text = None):
-        if (embeds := context.message.embeds):
-            url = embeds[0].url
+        if (files := context.message.embeds + context.message.attachments):
+            url = files[0].url
             text = None
         elif text:
             url = None

@@ -1,6 +1,9 @@
+import discord
 from discord.ext.commands import Converter, Context
+from discord.ext.commands.errors import RoleNotFound
 
 from mechadon import db
+from mechadon.models import RoleAlias
 
 
 class RoleLenient(Converter):
