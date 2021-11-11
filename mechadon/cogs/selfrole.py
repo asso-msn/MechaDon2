@@ -85,7 +85,7 @@ class SelfroleCog(BaseCog):
             lambda x: x.id in [r.role_id for r in roles_db],
             context.guild.roles
         )
-        await self.reply(context, *roles, sep='\n')
+        await self.reply(context, *roles, sep='\n', sort=True)
 
     @commands.command()
     async def aliases(self, context: Context):
@@ -94,5 +94,6 @@ class SelfroleCog(BaseCog):
         await self.reply(
             context,
             *[f'{x.alias} -> {roles_by_id[x.role_id]}' for x in aliases],
-            sep='\n'
+            sep='\n',
+            sort=True,
         )
