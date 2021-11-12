@@ -1,5 +1,6 @@
 import importlib
 from pathlib import Path
+from discord import Intents
 from discord.ext.commands import Bot
 from discord.mentions import AllowedMentions
 
@@ -7,11 +8,13 @@ from .config import Config
 
 
 APP_DIR = Path(__file__).parent
-
+intents = Intents.default()
+intents.members = True
 config = Config()
 bot = Bot(
     command_prefix=config.prefix,
     allowed_mentions=AllowedMentions(everyone=False, roles=False),
+    intents=intents,
 )
 
 
