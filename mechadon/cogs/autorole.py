@@ -17,6 +17,11 @@ class Autorole(db.Base):
             kwargs['server_id'] = role.guild.id
         super().__init__(*args, **kwargs)
 
+    @property
+    def id(self):
+        """Allow Autoroles to be used as Roles in most operations"""
+        return self.role_id
+
 
 class AutoroleCog(BaseCog):
     @staticmethod
