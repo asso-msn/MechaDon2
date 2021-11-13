@@ -5,7 +5,7 @@ from mechadon.formatters import member
 
 class AboutrolesCog(BaseCog):
     @commands.command()
-    async def whois(self, context: Context, role: RoleLenient):
+    async def whois(self, context: Context, *, role: RoleLenient):
         await self.reply_list(context, role.members, formatter=member)
 
     @commands.command()
