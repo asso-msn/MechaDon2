@@ -1,4 +1,4 @@
-from discord.ext.commands.errors import CommandError
+from discord.ext.commands.errors import CommandError, CommandNotFound
 from . import BaseCog, Cog, Context
 
 
@@ -13,6 +13,8 @@ class CoreCog(BaseCog):
 
     @Cog.listener()
     async def on_command_error(self, context: Context, error: Exception):
+        if isinstance(error, CommandNotFound):
+            raise error
         if isinstance(error, CommandError):
             await self.reply(context, error)
         else:
