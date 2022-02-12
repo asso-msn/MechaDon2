@@ -44,7 +44,7 @@ class BridgeCog(BaseCog):
             if not bridge.webhook:
                 continue
             requests.post(bridge.webhook, {
-                'content': message.content,
+                'content': message.clean_content,
                 'username': f'{message.author} (#{message.channel} @ {message.guild})',
                 'avatar_url': message.author.avatar.url if message.author.avatar else None,
             })
