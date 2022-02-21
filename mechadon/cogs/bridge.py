@@ -1,4 +1,4 @@
-from discord import TextChannel, Message
+from discord import TextChannel, Message, MessageType
 import requests
 import sqlalchemy as sa
 
@@ -38,13 +38,22 @@ class BridgeCog(BaseCog):
         if not incoming_bridge:
             return
         outcoming_bridges = db.session.query(Bridge).filter_by(name=incoming_bridge.name)
+        content = message.clean_content
+        if message.type == MessageType.reply:
+            replies_to = await message.channel.fetch_message(message.reference.message_id)
+            content = (
+                f'>{replies_to.author}: {replies_to.clean_content}\n\n'
+                + content
+            )
+        for attachment in message.attachments:
+            content += f'\n{attachment.url}'
         for bridge in outcoming_bridges:
             if bridge == incoming_bridge:
                 continue
             if not bridge.webhook:
                 continue
             requests.post(bridge.webhook, {
-                'content': message.clean_content,
+                'content': content,
                 'username': f'{message.author} (#{message.channel} @ {message.guild})',
                 'avatar_url': message.author.avatar.url if message.author.avatar else None,
             })
