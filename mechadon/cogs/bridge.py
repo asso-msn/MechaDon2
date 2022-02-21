@@ -1,9 +1,14 @@
 from discord import TextChannel, Message, MessageType
+import re
 import requests
 import sqlalchemy as sa
 
 from . import BaseCog, Cog, Context, commands
 from mechadon import db
+
+
+def escape_links(x: str):
+    return re.sub(r'\bhttps?://\S*\b', r'<\g<0>>', x)
 
 
 class Bridge(db.Base):
@@ -42,7 +47,9 @@ class BridgeCog(BaseCog):
         if message.type == MessageType.reply:
             replies_to = await message.channel.fetch_message(message.reference.message_id)
             content = (
-                f'>{replies_to.author}: {replies_to.clean_content}\n\n'
+                f'{replies_to.author}:'
+                + f'\n{escape_links(replies_to.clean_content)}'
+                + '\n\n'
                 + content
             )
         for attachment in message.attachments:
