@@ -1,8 +1,10 @@
 from discord import Cog
 from discord.ext.commands import Context, CommandError, CommandNotFound
 
+from mechadon.cogs import BaseCog
 
-class CoreCog(Cog):
+
+class CoreCog(BaseCog):
     @Cog.listener()
     async def on_ready(self):
         sep = '------'
