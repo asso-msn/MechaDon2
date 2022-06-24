@@ -7,6 +7,7 @@ class BaseCog(Cog):
 
     def __init__(self, bot: Bot = None):
         self.bot = bot
+        super().__init__()
 
     async def reply(
         self,
