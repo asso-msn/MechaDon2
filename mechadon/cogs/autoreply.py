@@ -1,11 +1,12 @@
 from io import BytesIO
 from discord import File, Message
+from discord.ext.commands import Cog, command, has_permissions, Context
 from discord.ext.commands.errors import CommandError
 import sqlalchemy as sa
 import requests
 
 from mechadon import db
-from . import BaseCog, Cog, Context, commands
+from mechadon.cogs import BaseCog
 
 
 class Autoreply(db.Base):
@@ -32,7 +33,6 @@ class Autoreply(db.Base):
         return File(BytesIO(response.content), self.file_url.split('/')[-1])
 
 
-
 class AutoreplyCog(BaseCog):
     @staticmethod
     def get_autoreplies(guild):
@@ -49,8 +49,8 @@ class AutoreplyCog(BaseCog):
                 await message.reply(reply.text, file=reply.get_file())
             message.channel.typing
 
-    @commands.command('reply')
-    @commands.has_permissions(administrator=True)
+    @command('reply')
+    @has_permissions(administrator=True)
     async def add_reply(self, context: Context, name, *, text = None):
         if (files := context.message.embeds + context.message.attachments):
             url = files[0].url
@@ -76,7 +76,7 @@ class AutoreplyCog(BaseCog):
         db.session.commit()
         await self.reply(context, 'Reply', name, 'added')
 
-    @commands.command()
+    @command()
     async def replies(self, context: Context):
         triggers = [x.trigger for x in self.get_autoreplies(context.guild)]
         await self.reply(context, *triggers, sep='\n')

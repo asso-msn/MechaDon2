@@ -1,14 +1,16 @@
+from discord.ext.commands import command, Context
+
+from mechadon.cogs import BaseCog
 from mechadon.converters import RoleLenient
-from . import BaseCog, Context, commands
 from mechadon.formatters import member
 
 
 class AboutrolesCog(BaseCog):
-    @commands.command()
+    @command()
     async def whois(self, context: Context, *, role: RoleLenient):
         await self.reply_list(context, role.members, formatter=member)
 
-    @commands.command()
+    @command()
     async def toproles(self, context: Context, maximum: int = 10):
         roles = [(len(x.members), x) for x in context.guild.roles]
         roles.sort(key=lambda x: x[0], reverse=True)
