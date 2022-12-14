@@ -1,11 +1,11 @@
 from io import BytesIO
+import re
 
 from discord import File, Message
 from discord.ext.commands import Cog, Context, command, has_permissions
 from discord.ext.commands.errors import CommandError
 import requests
 import sqlalchemy as sa
-import re
 
 from mechadon import db
 from mechadon.cogs import BaseCog
@@ -23,8 +23,8 @@ class Autoreply(db.Base):
 
     def matches(self, s: str):
         s = s.lower()
-        if self.trigger[0] == '/' and self.trigger[-1] == '/':
-            return re.match(self.trigger[1:-1], s)
+        if self.trigger.startswith('`/') and self.trigger.endswith('/`'):
+            return re.match(self.trigger[2:-2], s)
         trigger = self.trigger.lower()
         if not self.partial:
             return trigger == s
