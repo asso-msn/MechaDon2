@@ -1,4 +1,5 @@
 from io import BytesIO
+import random
 import re
 
 from discord import File, Message
@@ -20,6 +21,7 @@ class Autoreply(db.Base):
     server_id = sa.Column(db.Id, nullable=False, primary_key=True)
     text = sa.Column(sa.String)
     file_url = sa.Column(sa.String)
+    random = sa.Column(sa.Integer)
 
     def matches(self, s: str):
         s = s.lower()
@@ -49,6 +51,9 @@ class AutoreplyCog(BaseCog):
         for reply in self.get_autoreplies(message.guild):
             if not reply.matches(message.content):
                 continue
+            if reply.random:
+                if random.randint(1, reply.random) != 1:
+                    continue
             with message.channel.typing():
                 await message.reply(reply.text, file=reply.get_file())
             message.channel.typing
