@@ -1,9 +1,11 @@
 from io import BytesIO
+
 from discord import File, Message
-from discord.ext.commands import Cog, command, has_permissions, Context
+from discord.ext.commands import Cog, Context, command, has_permissions
 from discord.ext.commands.errors import CommandError
-import sqlalchemy as sa
 import requests
+import sqlalchemy as sa
+import re
 
 from mechadon import db
 from mechadon.cogs import BaseCog
@@ -21,12 +23,14 @@ class Autoreply(db.Base):
 
     def matches(self, s: str):
         s = s.lower()
+        if self.trigger[0] == '/' and self.trigger[-1] == '/':
+            return re.match(self.trigger[1:-1], s)
         trigger = self.trigger.lower()
         if not self.partial:
             return trigger == s
         return trigger in s.split()
 
-    def get_file(self) -> File:
+    def get_file(self):
         if not self.file_url:
             return None
         response = requests.get(self.file_url)
