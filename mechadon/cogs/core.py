@@ -1,5 +1,5 @@
 from discord import Cog
-from discord.ext.commands import Context, CommandError, CommandNotFound
+from discord.ext.commands import CommandError, CommandNotFound, Context
 
 from mechadon.cogs import BaseCog
 
@@ -7,12 +7,12 @@ from mechadon.cogs import BaseCog
 class CoreCog(BaseCog):
     @Cog.listener()
     async def on_ready(self):
-        sep = '------'
-        print(f'Logged in as {self.bot.user} (ID: {self.bot.user.id})')
+        sep = "------"
+        print(f"Logged in as {self.bot.user} (ID: {self.bot.user.id})")
         print(sep)
         print(f'Loaded cogs: {", ".join(self.bot.cogs.keys())}')
         print(sep)
-        print(f'Servers: {self.bot.guilds}')
+        print(f"Servers: {self.bot.guilds}")
         print(sep)
 
     @Cog.listener()
@@ -22,5 +22,5 @@ class CoreCog(BaseCog):
         if isinstance(error, CommandError):
             await self.bot.reply(context, error)
         else:
-            await self.bot.reply(context, 'An error occured')
+            await self.bot.reply(context, "An error occured")
         raise error

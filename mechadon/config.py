@@ -1,10 +1,10 @@
 import json
-from pathlib import Path
 import os
+from pathlib import Path
 
 
 class Config:
-    PATH = Path('config.json')
+    PATH = Path("config.json")
 
     def __init__(self):
         if self.PATH.exists():
@@ -14,7 +14,7 @@ class Config:
             self.file = {}
 
     def save(self):
-        with open(self.PATH, 'w') as f:
+        with open(self.PATH, "w") as f:
             json.dump(self.file, f, indent=2)
 
     def get(self, key, default=None):
@@ -29,12 +29,12 @@ class Config:
 
     @property
     def token(self):
-        return self.get('DISCORD_TOKEN')
+        return self.get("DISCORD_TOKEN")
 
     @property
     def prefix(self):
-        return self.get('PREFIX', '!')
+        return self.get("PREFIX", "!")
 
     @property
     def db_url(self):
-        return self.get('DB_URL', 'sqlite:///app.db')
+        return self.get("DB_URL", "sqlite:///app.db")

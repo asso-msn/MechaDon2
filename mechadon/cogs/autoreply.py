@@ -1,19 +1,19 @@
-from io import BytesIO
 import random
 import re
+from io import BytesIO
 
+import requests
+import sqlalchemy as sa
 from discord import File, Message
 from discord.ext.commands import Cog, Context, command, has_permissions
 from discord.ext.commands.errors import CommandError
-import requests
-import sqlalchemy as sa
 
 from mechadon import db
 from mechadon.cogs import BaseCog
 
 
 class Autoreply(db.Base):
-    __tablename__ = 'autoreplies'
+    __tablename__ = "autoreplies"
 
     trigger = sa.Column(sa.String, nullable=False, primary_key=True)
     partial = sa.Column(sa.Boolean, default=False)
@@ -25,7 +25,7 @@ class Autoreply(db.Base):
 
     def matches(self, s: str):
         s = s.lower()
-        if self.trigger.startswith('`/') and self.trigger.endswith('/`'):
+        if self.trigger.startswith("`/") and self.trigger.endswith("/`"):
             return re.match(self.trigger[2:-2], s)
         trigger = self.trigger.lower()
         if not self.partial:
@@ -36,7 +36,7 @@ class Autoreply(db.Base):
         if not self.file_url:
             return None
         response = requests.get(self.file_url)
-        return File(BytesIO(response.content), self.file_url.split('/')[-1])
+        return File(BytesIO(response.content), self.file_url.split("/")[-1])
 
 
 class AutoreplyCog(BaseCog):
@@ -58,21 +58,25 @@ class AutoreplyCog(BaseCog):
                 await message.reply(reply.text, file=reply.get_file())
             message.channel.typing
 
-    @command('reply')
+    @command("reply")
     @has_permissions(administrator=True)
-    async def add_reply(self, context: Context, name, *, text = None):
-        if (files := context.message.embeds + context.message.attachments):
+    async def add_reply(self, context: Context, name, *, text=None):
+        if files := context.message.embeds + context.message.attachments:
             url = files[0].url
             text = None
         elif text:
             url = None
-        elif (autoreply_db := self.get_autoreplies(context.guild).filter_by(trigger=name).first()):
+        elif (
+            autoreply_db := self.get_autoreplies(context.guild)
+            .filter_by(trigger=name)
+            .first()
+        ):
             db.session.delete(autoreply_db)
             db.session.commit()
-            await self.reply(context, 'Deleted reply', name)
+            await self.reply(context, "Deleted reply", name)
             return
         else:
-            raise CommandError('Can not be empty, provide either text or file')
+            raise CommandError("Can not be empty, provide either text or file")
         db.update_or_create(
             Autoreply,
             trigger=name,
@@ -80,12 +84,12 @@ class AutoreplyCog(BaseCog):
             file_url=url,
             text=text,
             added_by=context.author.id,
-            filter_keys=['trigger', 'server'],
+            filter_keys=["trigger", "server"],
         )
         db.session.commit()
-        await self.reply(context, 'Reply', name, 'added')
+        await self.reply(context, "Reply", name, "added")
 
     @command()
     async def replies(self, context: Context):
         triggers = [x.trigger for x in self.get_autoreplies(context.guild)]
-        await self.reply(context, *triggers, sep='\n')
+        await self.reply(context, *triggers, sep="\n")

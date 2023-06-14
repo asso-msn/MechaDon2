@@ -1,4 +1,4 @@
-from discord.ext.commands import command, Context
+from discord.ext.commands import Context, command
 
 from mechadon.cogs import BaseCog
 from mechadon.converters import RoleLenient
@@ -15,6 +15,10 @@ class AboutrolesCog(BaseCog):
         roles = [(len(x.members), x) for x in context.guild.roles]
         roles.sort(key=lambda x: x[0], reverse=True)
         roles = roles[:maximum]
+
         def formatter(x):
-            return f'{x[0]}: {x[1]}'
-        await self.reply_list(context, roles, formatter=formatter, sort=False, total=False)
+            return f"{x[0]}: {x[1]}"
+
+        await self.reply_list(
+            context, roles, formatter=formatter, sort=False, total=False
+        )

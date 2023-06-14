@@ -1,5 +1,5 @@
 import discord
-from discord.ext.commands import Converter, Context
+from discord.ext.commands import Context, Converter
 from discord.ext.commands.errors import RoleNotFound
 
 from mechadon import db
@@ -14,10 +14,14 @@ class RoleLenient(Converter):
     @classmethod
     def get_alias(cls, context: Context, argument: str):
         argument = cls.sanitize(argument)
-        return db.session.query(RoleAlias).filter(
-            RoleAlias.alias.ilike(argument),
-            RoleAlias.server_id == context.guild.id,
-        ).first()
+        return (
+            db.session.query(RoleAlias)
+            .filter(
+                RoleAlias.alias.ilike(argument),
+                RoleAlias.server_id == context.guild.id,
+            )
+            .first()
+        )
 
     @classmethod
     def get_role(cls, context: Context, argument: str):
@@ -26,7 +30,7 @@ class RoleLenient(Converter):
         for role in all_roles:
             if cls.sanitize(role.name) == argument:
                 return role
-        if (alias := cls.get_alias(context, argument)):
+        if alias := cls.get_alias(context, argument):
             return discord.utils.find(
                 lambda x: x.id == alias.role_id, all_roles
             )

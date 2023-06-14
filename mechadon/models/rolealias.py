@@ -4,7 +4,7 @@ from mechadon import db
 
 
 class RoleAlias(db.Base):
-    __tablename__ = 'role_aliases'
+    __tablename__ = "role_aliases"
 
     role_id = sa.Column(db.Id, nullable=False, primary_key=True)
     server_id = sa.Column(db.Id, nullable=False, primary_key=True)

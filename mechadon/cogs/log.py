@@ -1,8 +1,9 @@
-from discord import Message
-import sqlalchemy as sa
 import requests
+import sqlalchemy as sa
+from discord import Message
 
 from mechadon import db
+
 from . import BaseCog, Cog, Context, commands
 
 
@@ -20,11 +21,16 @@ class LogCog(BaseCog):
         server = message.guild
         log_hooks = db.session.query(LogHook).filter_by(server_id=server.id)
         for hook in log_hooks:
-            requests.post(hook.webhook, {
-                'content': f'[DELETED ({message.created_at})]\n{message.content}',
-                'username': f'{message.author} (#{message.channel})',
-                'avatar_url': message.author.avatar.url if message.author.avatar else None,
-            })
+            requests.post(
+                hook.webhook,
+                {
+                    "content": f"[DELETED ({message.created_at})]\n{message.content}",
+                    "username": f"{message.author} (#{message.channel})",
+                    "avatar_url": message.author.avatar.url
+                    if message.author.avatar
+                    else None,
+                },
+            )
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -32,7 +38,9 @@ class LogCog(BaseCog):
         server = context.guild
         for hook in db.session.query(LogHook).filter_by(server_id=server.id):
             db.session.delete(hook)
-        hook = LogHook(server_id=server.id, webhook=webhook_url, added_by=context.author.id)
+        hook = LogHook(
+            server_id=server.id, webhook=webhook_url, added_by=context.author.id
+        )
         db.session.add(hook)
         db.session.commit()
         await self.reply(context, "Added", hook)
