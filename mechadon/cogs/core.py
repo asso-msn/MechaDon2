@@ -20,7 +20,7 @@ class CoreCog(BaseCog):
         if isinstance(error, CommandNotFound):
             raise error
         if isinstance(error, CommandError):
-            await self.bot.reply(context, error)
+            await self.reply(context, error)
         else:
-            await self.bot.reply(context, "An error occured")
+            await self.reply(context, "An error occured")
         raise error
