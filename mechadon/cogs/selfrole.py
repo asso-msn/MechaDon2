@@ -60,8 +60,7 @@ class SelfroleCog(BaseCog):
             filter_keys=['alias', 'server_id'],
         )
         db.session.commit()
-        await self.reply(context, action, alias_db)
-
+        await self.reply(context, action, alias_db.str(context))
 
     @commands.command()
     async def role(self, context: Context, *, role: RoleLenient):
@@ -89,11 +88,12 @@ class SelfroleCog(BaseCog):
 
     @commands.command()
     async def aliases(self, context: Context):
-        roles_by_id = {x.id: x for x in context.guild.roles}
-        aliases = db.session.query(RoleAlias).filter_by(server_id=context.guild.id)
+        aliases = db.session.query(RoleAlias).filter_by(
+            server_id=context.guild.id
+        )
         await self.reply(
             context,
-            *[f'{x.alias} -> {roles_by_id[x.role_id]}' for x in aliases],
-            sep='\n',
+            (x.str(context) for x in aliases),
+            sep="\n",
             sort=True,
         )
