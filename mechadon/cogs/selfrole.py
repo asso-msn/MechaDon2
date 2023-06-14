@@ -99,7 +99,7 @@ class SelfroleCog(BaseCog):
         )
         await self.reply(
             context,
-            (x.str(context) for x in aliases),
+            [x.str(context) for x in aliases],
             sep="\n",
             sort=True,
         )
