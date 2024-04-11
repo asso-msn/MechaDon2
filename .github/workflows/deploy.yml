@@ -7,31 +7,11 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Clone Ansible
-        uses: actions/checkout@v2
-        with:
-          repository: Tina-otoge/infra
-          ref: master
-      - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r requirements.txt
-      - name: Save SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-      - name: Run Ansible
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: false
-        run: |
-          ansible-playbook -l ${{ secrets.DEPLOY_HOST }} playbooks/deploy_as.yml \
-            -u ${{ secrets.DEPLOY_LOGIN_USER }} \
-            -e "deploy_user=${{ secrets.DEPLOY_USER }}" \
-            -e "deploy_git=${{ github.server_url }}/${{ github.repository }}" \
-            -e "deploy_version=${{ github.sha }}" \
-            -e deploy_app=MechaDon2 \
-            -e deploy_service=mechadon \
+    uses: Tina-otoge/infra/.github/workflows/deploy-workflow.yml@master
+    with:
+      app: MechaDon2
+      service: mechadon
+      host: "${{ secrets.DEPLOY_HOST }}"
+      user: "${{ secrets.DEPLOY_USER }}"
+      key: "${{ secrets.DEPLOY_KEY }}"
+      login_user: "${{ secrets.DEPLOY_LOGIN_USER }}"
