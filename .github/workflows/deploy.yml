@@ -28,4 +28,10 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: false
         run: |
-          ansible-playbook -l ${{ secrets.DEPLOY_HOST }} playbooks/deploy/mechadon.yml -e "deploy_version=${{ github.sha }}" -e "deploy_user=${{ secrets.DEPLOY_USER }}" -u ${{ secrets.DEPLOY_LOGIN_USER }}
+          ansible ${{ secrets.DEPLOY_HOST }} -m include_role -a name=deploy \
+            -e "deploy_version=${{ github.sha }}" \
+            -e deploy_app=MechaDon2 \
+            -e deploy_service=mechadon \
+            -e "deploy_git=${{ github.repositoryUrl }}" \
+            -u ${{ secrets.DEPLOY_LOGIN_USER }} \
+            --become-user ${{ secrets.DEPLOY_USER }}
