@@ -11,6 +11,7 @@ jobs:
     with:
       app: MechaDon2
       service: mechadon
+    secrets:
       host: "${{ secrets.DEPLOY_HOST }}"
       user: "${{ secrets.DEPLOY_USER }}"
       key: "${{ secrets.DEPLOY_KEY }}"
