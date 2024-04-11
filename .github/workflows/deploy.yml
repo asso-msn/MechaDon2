@@ -1,0 +1,31 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Ansible
+        uses: actions/checkout@v2
+        with:
+          repository: Tina-otoge/infra
+          ref: master
+      - name: Install dependencies
+        run: |
+          pip install -U pip
+          pip install -r requirements.txt
+      - name: Save SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+      - name: Run Ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: false
+        run: |
+          ansible-playbook -l ${{ secrets.DEPLOY_HOST }} playbooks/deploy/mechadon.yml -e "deploy_version=${{ github.sha }}" -e "deploy_user=${{ secrets.DEPLOY_USER }}" -u ${{ secrets.DEPLOY_LOGIN_USER }}
