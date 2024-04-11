@@ -31,7 +31,7 @@ jobs:
           ansible-playbook -l ${{ secrets.DEPLOY_HOST }} playbooks/deploy_as.yml \
             -u ${{ secrets.DEPLOY_LOGIN_USER }} \
             -e "deploy_user=${{ secrets.DEPLOY_USER }}" \
-            -e "deploy_git=${{ github.repositoryUrl }}" \
+            -e "deploy_git=${{ github.server_url }}/${{ github.repository }}" \
             -e "deploy_version=${{ github.sha }}" \
             -e deploy_app=MechaDon2 \
             -e deploy_service=mechadon \
