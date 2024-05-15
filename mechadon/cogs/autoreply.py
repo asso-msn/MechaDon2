@@ -20,7 +20,6 @@ class Autoreply(db.Base):
     added_by = sa.Column(db.Id)
     server_id = sa.Column(db.Id, nullable=False, primary_key=True)
     text = sa.Column(sa.String)
-    file_url = sa.Column(sa.String)
     random = sa.Column(sa.Integer)
 
     def matches(self, s: str):
@@ -31,12 +30,6 @@ class Autoreply(db.Base):
         if not self.partial:
             return trigger == s
         return trigger in s.split()
-
-    def get_file(self):
-        if not self.file_url:
-            return None
-        response = requests.get(self.file_url)
-        return File(BytesIO(response.content), self.file_url.split("/")[-1])
 
 
 class AutoreplyCog(BaseCog):
@@ -55,33 +48,35 @@ class AutoreplyCog(BaseCog):
                 if random.randint(1, reply.random) != 1:
                     continue
             with message.channel.typing():
-                await message.reply(reply.text, file=reply.get_file())
-            message.channel.typing
+                await message.reply(reply.text)
 
     @command("reply")
     @has_permissions(administrator=True)
     async def add_reply(self, context: Context, name, *, text=None):
-        if files := context.message.embeds + context.message.attachments:
-            url = files[0].url
-            text = None
-        elif text:
-            url = None
-        elif (
-            autoreply_db := self.get_autoreplies(context.guild)
-            .filter_by(trigger=name)
-            .first()
-        ):
+        text = text or ""
+        files = context.message.embeds + context.message.attachments
+        if files:
+            urls = " ".join(x.url for x in files)
+            if text:
+                text += "\n" + urls
+            else:
+                text = urls
+        if not text:
+            autoreply_db = (
+                self.get_autoreplies(context.guild)
+                .filter_by(trigger=name)
+                .first()
+            )
+            if not autoreply_db:
+                return await self.reply(context, "No such reply to delete")
             db.session.delete(autoreply_db)
             db.session.commit()
-            await self.reply(context, "Deleted reply", name)
-            return
-        else:
-            raise CommandError("Can not be empty, provide either text or file")
+            return await self.reply(context, "Deleted reply", name)
+
         db.update_or_create(
             Autoreply,
             trigger=name,
             server_id=context.guild.id,
-            file_url=url,
             text=text,
             added_by=context.author.id,
             filter_keys=["trigger", "server"],
