@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from discord import Message, MessageType, TextChannel
-from discord.ext.commands import Cog, command
+from discord.ext.commands import Cog, command, has_permissions
 
 from mechadon import db
 from mechadon.cogs import BaseCog, Context
@@ -38,6 +38,7 @@ class AutoreactsCog(BaseCog):
             return
 
     @command()
+    @has_permissions(administrator=True)
     async def react(
         self, context: Context, react: str = None, channel: TextChannel = None
     ):
@@ -47,6 +48,7 @@ class AutoreactsCog(BaseCog):
         return await self.toggle_react(context, react, channel)
 
     @command()
+    @has_permissions(administrator=True)
     async def welcome(self, context: Context, react: str = None):
         react = react or "👋"
         await self.toggle_react(context, react, channel="welcome")
