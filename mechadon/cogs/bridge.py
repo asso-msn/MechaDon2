@@ -66,9 +66,20 @@ class BridgeCog(BaseCog):
             replies_to = await message.channel.fetch_message(
                 message.reference.message_id
             )
+            if not replies_to.author.bot:
+                author = replies_to.author.display_name
+            else:
+                author = str(replies_to.author)
+                if "#" in author and "(" in author and ")" in author:
+                    last_paren = author.rfind("(")
+                    author = author[:last_paren].strip()
+
             content = (
-                f"{replies_to.author}:"
-                + f"\n{escape_links(replies_to.clean_content)}"
+                f"Replying to {author}:\n"
+                + "> "
+                + "\n> ".join(
+                    escape_links(replies_to.clean_content).split("\n")
+                )
                 + "\n\n"
                 + content
             )
@@ -83,9 +94,11 @@ class BridgeCog(BaseCog):
                 bridge.webhook,
                 {
                     "content": content,
-                    "username": f"{message.author} (#{message.channel} @ {message.guild})",
-                    "avatar_url": message.author.avatar.url
-                    if message.author.avatar
-                    else None,
+                    "username": f"{message.author.display_name} (#{message.channel} @ {message.guild})",
+                    "avatar_url": (
+                        message.author.avatar.url
+                        if message.author.avatar
+                        else None
+                    ),
                 },
             )
