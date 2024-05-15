@@ -57,3 +57,4 @@ def update_or_create(model, filter_keys=None, **kwargs):
 
 
 Id = sa.Integer
+from sqlalchemy import Column, Integer, String
