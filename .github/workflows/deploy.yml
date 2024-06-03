@@ -16,3 +16,4 @@ jobs:
       user: "${{ secrets.DEPLOY_USER }}"
       key: "${{ secrets.DEPLOY_KEY }}"
       login_user: "${{ secrets.DEPLOY_LOGIN_USER }}"
+      webhook_url: "${{ secrets.WEBHOOK_URL }}"
