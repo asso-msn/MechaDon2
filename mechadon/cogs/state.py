@@ -15,6 +15,7 @@ class State(db.Base):
     channel_text = db.Column(db.String)
     message_id = db.Column(db.Id)
     message_text = db.Column(db.String)
+    announce_channel_id = db.Column(db.Id)
 
     def __str__(self):
         return f"{self.__class__.__name__} {self.react}"
@@ -49,6 +50,13 @@ class StateCog(BaseCog):
         if state.channel_id and state.channel_text:
             channel = await self.bot.fetch_channel(state.channel_id)
             await channel.edit(name=state.channel_text)
+
+        if state.announce_channel_id:
+            channel = await self.bot.fetch_channel(state.announce_channel_id)
+            author = channel.guild.get_member(payload.user_id)
+            await channel.send(
+                f"{author.display_name} changed the state to {state.react}"
+            )
 
         if state.icon:
             guild = self.bot.get_guild(payload.guild_id)
@@ -88,6 +96,9 @@ class StateCog(BaseCog):
         await self.reply(context, action, state)
 
     async def update_state(self, context, state, key, value):
+        def sanitize_id(value):
+            return value.split("/")[-1].strip("<>#")
+
         if key == "icon":
             files = context.message.embeds + context.message.attachments
             if files:
@@ -96,15 +107,19 @@ class StateCog(BaseCog):
                 value = value and value.strip("<>")
 
         if key == "react":
-            value = value.split("/")[-1]
+            value = sanitize_id(value)
             key = "react_message_id"
 
         if key == "channel":
-            value = value.split("/")[-1]
+            value = sanitize_id(value)
             key = "channel_id"
 
         if key == "name":
             key = "channel_text"
+
+        if key == "announce":
+            value = sanitize_id(value)
+            key = "announce_channel_id"
 
         setattr(state, key, value)
         db.session.commit()
