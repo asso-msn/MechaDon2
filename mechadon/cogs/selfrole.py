@@ -1,3 +1,5 @@
+import random
+
 import sqlalchemy as sa
 from discord import Role
 from discord.ext.commands.errors import CommandError
@@ -90,7 +92,19 @@ class SelfroleCog(BaseCog):
         roles = filter(
             lambda x: x.id in [r.role_id for r in roles_db], context.guild.roles
         )
-        await self.reply(context, *roles, sep="\n", sort=True)
+        aliases = db.session.query(RoleAlias).filter_by(
+            server_id=context.guild.id
+        )
+        aliases_picks = random.sample(list(aliases), min(5, aliases.count()))
+        roles = [str(x) for x in roles]
+        roles.sort(key=str.lower)
+        msg = "\n".join(roles)
+        if aliases_picks:
+            msg += (
+                "\n\nYou can also use aliases for convenience, examples:\n"
+                + "\n".join([x.str(context) for x in aliases_picks])
+            )
+        await self.reply(context, msg)
 
     @commands.command()
     async def aliases(self, context: Context):
