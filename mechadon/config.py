@@ -38,3 +38,7 @@ class Config:
     @property
     def db_url(self):
         return self.get("DB_URL", "sqlite:///app.db")
+
+    @property
+    def deepseek_api_key(self):
+        return self.get("DEEPSEEK_API_KEY")
