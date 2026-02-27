@@ -1,5 +1,5 @@
-from discord import Bot, Embed
-from discord.ext.commands import Cog, Context
+from discord import Embed
+from discord.ext.commands import Bot, Cog, Context
 from discord.mentions import AllowedMentions
 
 

@@ -1,3 +1,5 @@
+import asyncio
+
 import mechadon
 
-mechadon.run()
+asyncio.run(mechadon.run())

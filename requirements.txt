@@ -1,4 +1,4 @@
-py-cord
+discord.py
 
 alembic
 sqlalchemy

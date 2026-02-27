@@ -1,5 +1,4 @@
-from discord import Cog
-from discord.ext.commands import CommandError, CommandNotFound, Context
+from discord.ext.commands import Cog, CommandError, CommandNotFound, Context
 
 from mechadon.cogs import BaseCog
 
