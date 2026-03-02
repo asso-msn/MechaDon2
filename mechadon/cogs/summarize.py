@@ -1,6 +1,6 @@
 from discord.ext.commands import Context, command
 
-from mechadon import deepseek
+from mechadon import ai
 
 from . import BaseCog
 
@@ -23,6 +23,6 @@ class SummarizeCog(BaseCog):
         )
 
         async with context.typing():
-            result = deepseek.summarize(log)
+            result = ai.summarize(log)
 
         await self.reply(context, result)
