@@ -38,3 +38,7 @@ class Config:
     @property
     def db_url(self):
         return self.get("DB_URL", "sqlite:///app.db")
+
+    @property
+    def bot_admin_user_ids(self):
+        return self.get("BOT_ADMIN_USER_IDS", [])

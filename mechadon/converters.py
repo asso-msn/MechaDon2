@@ -1,9 +1,55 @@
+from typing import Union
+
 import discord
-from discord.ext.commands import Context, Converter
-from discord.ext.commands.errors import RoleNotFound
+from discord import TextChannel, User
+from discord.ext.commands import BadArgument, Context, Converter
+from discord.ext.commands.errors import ChannelNotFound, RoleNotFound
 
 from mechadon import db
 from mechadon.models import RoleAlias
+
+
+class ChannelConverter(Converter):
+    async def convert(self, ctx: Context, argument: str) -> TextChannel:
+        if argument.startswith("<#") and argument.endswith(">"):
+            argument = argument[2:-1]
+
+        if argument.isdigit():
+            if channel := ctx.bot.get_channel(int(argument)):
+                return channel
+
+        if ctx.guild:
+            for channel in ctx.guild.text_channels:
+                if channel.name == argument:
+                    return channel
+
+        raise ChannelNotFound(argument)
+
+
+class ChannelOrUser(ChannelConverter):
+    async def convert(
+        self, ctx: Context, argument: str
+    ) -> Union[TextChannel, User]:
+        raw = argument
+        if raw.startswith("<@") and raw.endswith(">"):
+            raw = raw[2:-1].lstrip("!")
+            if raw.isdigit():
+                if user := ctx.bot.get_user(int(raw)):
+                    return user
+            raise BadArgument(f'Could not resolve "{argument}" as a user.')
+
+        try:
+            return await super().convert(ctx, argument)
+        except ChannelNotFound:
+            pass
+
+        if argument.isdigit():
+            if user := ctx.bot.get_user(int(argument)):
+                return user
+
+        raise BadArgument(
+            f'Could not resolve "{argument}" as a channel or user.'
+        )
 
 
 class RoleLenient(Converter):
