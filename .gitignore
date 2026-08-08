@@ -2,3 +2,5 @@
 /app.db*
 __pycache__/
 /.venv/
+/.mypy_cache/
+/.vscode/

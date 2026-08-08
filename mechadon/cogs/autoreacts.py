@@ -10,13 +10,18 @@ class Autoreact(db.Base):
     server_id = sa.Column(db.Id, nullable=False, primary_key=True)
     channel_id = sa.Column(db.Id, nullable=False, primary_key=True)
     react = sa.Column(sa.String, nullable=False, primary_key=True)
+    lookup = sa.Column(sa.String, nullable=False, default="", primary_key=True)
 
     def __str__(self):
         if self.channel_id != "welcome":
             channel_url = f"https://discord.com/channels/{self.server_id}/{self.channel_id}"
         else:
             channel_url = "welcome"
-        return f"{self.__class__.__name__} {self.react} in {channel_url}"
+        
+        if self.lookup == "":
+            return f"{self.__class__.__name__} {self.react} in {channel_url}"
+        else:
+            return f"{self.__class__.__name__} {self.react} for word {self.lookup} in {channel_url}"
 
 
 class AutoreactsCog(BaseCog):
@@ -34,18 +39,19 @@ class AutoreactsCog(BaseCog):
             for row in db.session.query(Autoreact).filter_by(
                 server_id=message.guild.id, channel_id=message.channel.id
             ):
-                await message.add_reaction(row.react)
+                if row.lookup == "" or row.lookup in message.content:
+                    await message.add_reaction(row.react)
             return
 
     @command()
     @has_permissions(administrator=True)
     async def react(
-        self, context: Context, react: str = None, channel: TextChannel = None
+        self, context: Context, react: str = None, lookup: str = "", channel: TextChannel = None
     ):
 
         if not react:
             return await self.list_reacts(context, channel)
-        return await self.toggle_react(context, react, channel)
+        return await self.toggle_react(context, react, lookup, channel)
 
     @command()
     @has_permissions(administrator=True)
@@ -67,7 +73,7 @@ class AutoreactsCog(BaseCog):
         await self.reply_list(context, reacts)
 
     async def toggle_react(
-        self, context: Context, react: str, channel: TextChannel = None
+        self, context: Context, react: str, lookup: str = "", channel: TextChannel = None
     ):
         channel = channel or context.channel
         if channel == "welcome":
@@ -78,7 +84,7 @@ class AutoreactsCog(BaseCog):
         if (
             obj := db.session.query(Autoreact)
             .filter_by(
-                server_id=context.guild.id, channel_id=channel_id, react=react
+                server_id=context.guild.id, channel_id=channel_id, react=react, lookup=lookup
             )
             .first()
         ):
@@ -91,6 +97,7 @@ class AutoreactsCog(BaseCog):
             server_id=context.guild.id,
             channel_id=channel_id,
             react=react,
+            lookup=lookup,
         )
         db.session.add(obj)
         db.session.commit()
