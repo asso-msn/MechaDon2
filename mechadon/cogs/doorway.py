@@ -58,16 +58,20 @@ class DoorwayCog(BaseCog):
         """Toggle announcements of members joining the server."""
         await self.toggle_channel(context, "join", channel)
 
-    async def announce(self, member: Member, event: str, action: str):
+    async def announce(
+        self, member: Member, event: str, emoji: str, action: str
+    ):
         member_str = formatters.member(member)
         for entry in self.get_channels(member.guild, event):
             channel = self.bot.get_partial_messageable(entry.channel_id)
-            await channel.send(f"{member_str} ({member.mention}) {action}")
+            await channel.send(
+                f"{emoji} {member_str} ({member.mention}) {action}"
+            )
 
     @Cog.listener()
     async def on_member_remove(self, member: Member):
-        await self.announce(member, "leave", "just left the server.")
+        await self.announce(member, "leave", "🔴", "just left the server.")
 
     @Cog.listener()
     async def on_member_join(self, member: Member):
-        await self.announce(member, "join", "just joined the server.")
+        await self.announce(member, "join", "🟢", "just joined the server.")
